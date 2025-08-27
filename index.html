@@ -323,24 +323,13 @@ let declineBtn = document.createElement("button");
   let span = document.createElement("span");
   span.textContent = data.text;
 
-                        // Apply strikethrough if already approved
-if (checkbox.checked) {
-  span.style.textDecoration = "line-through";
-}
-
-// Add event listener to toggle strikethrough dynamically
+                        // Add strikethrough only when user checks it manually
 checkbox.addEventListener("change", () => {
   if (checkbox.checked) {
     span.style.textDecoration = "line-through";
   } else {
     span.style.textDecoration = "none";
   }
-});
-
-  li.appendChild(checkbox);
-  li.appendChild(span);
-  approved.appendChild(li);
-      }
     });
   });
                
@@ -352,4 +341,5 @@ checkbox.addEventListener("change", () => {
   </script>
 </body>
 </html>
+
 
