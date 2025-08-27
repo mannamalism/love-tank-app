@@ -142,10 +142,10 @@
     <h3>To-Do List 🗒️</h3>
     <input type="text" id="todoInput" placeholder="Suggest an activity...">
     <button onclick="addTodo()">Add Request</button>
-    <h4>Pending Requests</h4>
-    <ul id="pendingList"></ul>
-    <h4>Approved Activities</h4>
+     <h4>Approved Activities</h4>
     <ul id="approvedList"></ul>
+   <h4>Pending Requests</h4>
+    <ul id="pendingList"></ul>
   </div>
   <!-- Firebase + JS -->
 <script type="module">
@@ -241,12 +241,20 @@ onSnapshot(collection(db, "notes"), (snapshot) => {
     list.innerHTML = "";
     snapshot.forEach((docSnap) => {
       let data = docSnap.data();
-      let li = document.createElement("li");
-      li.innerHTML = `<label><input type="checkbox" ${data.done ? "checked" : ""}> ${data.text}</label>`;
-      li.querySelector("input").addEventListener("change", async (e) => {
-        await updateDoc(doc(db, "topics", docSnap.id), { done: e.target.checked });
-      });
-      list.appendChild(li);
+  let li = document.createElement("li");
+li.style.display = "flex";         // makes it inline
+li.style.alignItems = "center";    // centers vertically
+li.style.gap = "3px";              // spacing between checkbox and text
+
+let checkbox = document.createElement("input");
+checkbox.type = "checkbox";
+
+let span = document.createElement("span");
+span.textContent = data.text;
+
+li.appendChild(checkbox);
+li.appendChild(span);
+topicsList.appendChild(li);
     });
   });
     // --- To-do list ---
@@ -257,29 +265,53 @@ onSnapshot(collection(db, "notes"), (snapshot) => {
     document.getElementById("todoInput").value = "";
   }
   onSnapshot(collection(db, "todos"), (snapshot) => {
-    const pending = document.getElementById("pendingList");
-    const approved = document.getElementById("approvedList");
-    pending.innerHTML = "";
-    approved.innerHTML = "";
-    snapshot.forEach((docSnap) => {
-      let data = docSnap.data();
-      let li = document.createElement("li");
+  const pending = document.getElementById("pendingList");
+  const approved = document.getElementById("approvedList");
+  pending.innerHTML = "";
+  approved.innerHTML = "";
+
+  snapshot.forEach((docSnap) => {
+    let data = docSnap.data();
+    let li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+
+    if (data.status === "pending") {
       li.textContent = data.text;
-      if (data.status === "pending") {
-        let div = document.createElement("div");
-        div.classList.add("actions");
-        let approveBtn = document.createElement("button");
-        approveBtn.textContent = "✔";
-        approveBtn.onclick = async () => await updateDoc(doc(db, "todos", docSnap.id), { status: "approved" });
-        let declineBtn = document.createElement("button");
-        declineBtn.textContent = "✖";
-        declineBtn.onclick = async () => await deleteDoc(doc(db, "todos", docSnap.id));
-        div.appendChild(approveBtn);
-        div.appendChild(declineBtn);
-        li.appendChild(div);
-        pending.appendChild(li);
-      } else if (data.status === "approved") {
-        approved.appendChild(li);
+      let div = document.createElement("div");
+      div.classList.add("actions");
+
+      let approveBtn = document.createElement("button");
+      approveBtn.textContent = "✔";
+      approveBtn.onclick = async () =>
+        await updateDoc(doc(db, "todos", docSnap.id), { status: "approved" });
+let declineBtn = document.createElement("button");
+      declineBtn.textContent = "✖";
+      declineBtn.onclick = async () =>
+        await deleteDoc(doc(db, "todos", docSnap.id));
+
+      div.appendChild(approveBtn);
+      div.appendChild(declineBtn);
+      li.appendChild(div);
+      pending.appendChild(li);
+    } 
+    
+    else if (data.status === "approved") {
+  let li = document.createElement("li");
+  li.style.display = "flex";          // inline layout
+  li.style.alignItems = "center";     // vertical alignment
+  li.style.gap = "3px";               // spacing between checkbox and text
+
+  let checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = true;            // mark approved ones as checked
+
+  let span = document.createElement("span");
+  span.textContent = data.text;
+
+  li.appendChild(checkbox);
+  li.appendChild(span);
+  approved.appendChild(li);
       }
     });
   });
