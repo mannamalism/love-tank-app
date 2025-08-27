@@ -296,7 +296,7 @@ topicsList.appendChild(li);
       div.classList.add("actions");
 
       let approveBtn = document.createElement("button");
-      approveBtn.textContent = "";
+      approveBtn.textContent = "✔";
       approveBtn.onclick = async () =>
         approveBtn.onclick = async () => {
   await updateDoc(doc(db, "todos", docSnap.id), { 
@@ -305,7 +305,7 @@ topicsList.appendChild(li);
   });
 };
 let declineBtn = document.createElement("button");
-      declineBtn.textContent = "";
+      declineBtn.textContent = "✖";
       declineBtn.onclick = async () =>
         await deleteDoc(doc(db, "todos", docSnap.id));
 
@@ -353,3 +353,4 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
+
