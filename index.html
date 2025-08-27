@@ -20,6 +20,11 @@
       justify-content: space-between;
       margin: 20px 0;
     }
+    .tanks {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
     .tank {
       width: 48%;
       text-align: center;
@@ -35,7 +40,15 @@
       background: #ddd;
       margin: 10px 0;
       overflow: hidden;
-      }
+    }
+        .progress {
+      width: 100%;
+      height: 30px;
+      border-radius: 5px;
+      background: #ddd;
+      margin: 10px 0;
+      overflow: hidden;
+    }
     .progress-fill {
       height: 100%;
       width: 0%;
@@ -55,7 +68,7 @@
       cursor: pointer;
     }
     button:hover {
-    	opacity: 0.8;
+      opacity: 0.8;
     }
     .section {
       margin: 20px 0;
@@ -75,23 +88,16 @@
       list-style: none;
       padding: 0;
     }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin: 8px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
+        li {
       padding: 5px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #eee;
+    }
+    li small {
+      color: gray;
+      margin-left: 10px;
     }
     .actions button {
       margin-left: 5px;
@@ -105,26 +111,25 @@
     <div class="tank khaled">
       <h3>Khaled's Tank</h3>
       <div class="progress"><div class="progress-fill" id="khaled-fill"></div></div>
-<button onclick="updateTank('khaled', -20)">-</button>
-<button onclick="updateTank('khaled', 20)">+</button>
-
+      <button onclick="updateTank('khaled', -20)">-</button>
+      <button onclick="updateTank('khaled', 20)">+</button>
     </div>
     <div class="tank manna">
       <h3>Manna's Tank</h3>
       <div class="progress"><div class="progress-fill" id="manna-fill"></div></div>
-  <button onclick="updateTank('manna', -20)">-</button>
-  <button onclick="updateTank('manna', 20)">+</button>
+      <button onclick="updateTank('manna', -20)">-</button>
+      <button onclick="updateTank('manna', 20)">+</button>
     </div>
   </div>
-
-  <!-- Notes -->
+    <!-- Notes -->
   <div class="section">
     <h3>Notes 💌</h3>
     <input type="text" id="noteInput" placeholder="Write a note...">
     <button onclick="addNote()">Add Note</button>
     <ul id="notesList"></ul>
   </div>
-    <!-- Topics -->
+
+  <!-- Topics -->
   <div class="section">
     <h3>Topics to Talk About 💭</h3>
     <input type="text" id="topicInput" placeholder="Add a topic...">
@@ -142,55 +147,85 @@
     <h4>Approved Activities</h4>
     <ul id="approvedList"></ul>
   </div>
-    <!-- Firebase + JS -->
+  <!-- Firebase + JS -->
   <script type="module">
     // Import Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { 
+      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, 
+      collection, addDoc, deleteDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // TODO: replace with your Firebase config
+    // Firebase config (your values)
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyA_1mznVFDuuC-LV2ALwBMZCD1GshYk8eQ",
+      authDomain: "khaled-manna-space-69ddd.firebaseapp.com",
+      projectId: "khaled-manna-space-69ddd",
+      storageBucket: "khaled-manna-space-69ddd.firebasestorage.app",
+      messagingSenderId: "358770486404",
+      appId: "1:358770486404:web:4773fda8886657e69326d1"
     };
-
     // Init Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-        // Tanks
-    async function updateTank(person, change) {
-      const ref = doc(db, "tanks", "levels");
-      const snap = await getDoc(ref);
-      let data = snap.exists() ? snap.data() : { khaled: 0, manna: 0 };
-      data[person] = Math.max(0, Math.min(100, (data[person] || 0) + change));
-      await setDoc(ref, data);
+// Tanks
+async function updateTank(person, change) {
+  const ref = doc(db, "tanks", "levels");
+  try {
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      let current = snap.data()[person] || 0;
+      let newVal = Math.max(0, Math.min(100, current + change));
+      console.log("Updating", person, "to", newVal);
+      await updateDoc(ref, { [person]: newVal });
+    } else {
+      console.log("No doc found, creating default");
+      await setDoc(ref, { khaled: 0, manna: 0 });
     }
-
-    onSnapshot(doc(db, "tanks", "levels"), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        document.getElementById("khaled-fill").style.width = data.khaled + "%";
-        document.getElementById("manna-fill").style.width = data.manna + "%";
-      }
-    });
-
-    // Notes
+  } catch (err) {
+    console.error("Error updating tank:", err);
+  }
+}
+// Real-time listener
+onSnapshot(doc(db, "tanks", "levels"), (docSnap) => {
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    console.log("Snapshot update:", data);
+    document.getElementById("khaled-fill").style.width = (data.khaled || 0) + "%";
+    document.getElementById("manna-fill").style.width = (data.manna || 0) + "%";
+  } else {
+    console.log("No snapshot found for tanks/levels");
+  }
+});
+        // Notes
     async function addNote() {
       const val = document.getElementById("noteInput").value;
       if (val.trim() === "") return;
-      await addDoc(collection(db, "notes"), { text: val });
+
+      await addDoc(collection(db, "notes"), { 
+        text: val,
+        createdAt: new Date()
+      });
+
       document.getElementById("noteInput").value = "";
     }
-onSnapshot(collection(db, "notes"), (snapshot) => {
+
+    onSnapshot(collection(db, "notes"), (snapshot) => {
       const list = document.getElementById("notesList");
       list.innerHTML = "";
       snapshot.forEach((doc) => {
+        let data = doc.data();
         let li = document.createElement("li");
-        li.textContent = doc.data().text;
+// Convert timestamp
+        let date = data.createdAt?.toDate 
+          ? data.createdAt.toDate() 
+          : new Date(data.createdAt);
+        let formatted = date.toLocaleString("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        });
+
+        li.innerHTML = `<span>${data.text}</span> <small>${formatted}</small>`;
         list.appendChild(li);
       });
     });
@@ -202,7 +237,7 @@ onSnapshot(collection(db, "notes"), (snapshot) => {
       await addDoc(collection(db, "topics"), { text: val, done: false });
       document.getElementById("topicInput").value = "";
     }
-onSnapshot(collection(db, "topics"), (snapshot) => {
+    onSnapshot(collection(db, "topics"), (snapshot) => {
       const list = document.getElementById("topicsList");
       list.innerHTML = "";
       snapshot.forEach((docSnap) => {
@@ -248,8 +283,13 @@ onSnapshot(collection(db, "topics"), (snapshot) => {
         } else if (data.status === "approved") {
           approved.appendChild(li);
         }
-              });
-    });
+           });
+               }); 
+           // Expose functions globally for onclick
+window.updateTank = updateTank;
+window.addNote = addNote;
+window.addTopic = addTopic;
+window.addTodo = addTodo;
   </script>
 </body>
 </html>
