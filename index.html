@@ -210,50 +210,59 @@
     });
     document.getElementById("noteInput").value = "";
   }
-  
-onSnapshot(collection(db, "notes"), (snapshot) => {
+  onSnapshot(collection(db, "notes"), (snapshot) => {
   const list = document.getElementById("notesList");
   list.innerHTML = "";
 
+  // collect all notes first
+  let notes = [];
   snapshot.forEach((docSnap) => {
-    let data = docSnap.data();
-    let date = data.createdAt?.toDate 
-      ? data.createdAt.toDate() 
+    notes.push({ id: docSnap.id, ...docSnap.data() });
+  });
+
+  // sort by createdAt (newest first)
+  notes.sort((a, b) => {
+    let da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+    let db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+    return db - da; // newest first
+  });
+    // now render in sorted order
+  notes.forEach((data) => {
+    let date = data.createdAt?.toDate
+      ? data.createdAt.toDate()
       : new Date(data.createdAt);
     let formatted = date.toLocaleString("en-US", {
       dateStyle: "medium",
       timeStyle: "short"
     });
-        // list item container
+
     let li = document.createElement("li");
     li.style.display = "flex";
     li.style.justifyContent = "space-between";
     li.style.alignItems = "center";
 
-    // left side: note + date
     let left = document.createElement("span");
     left.innerHTML = `${data.text} <small>${formatted}</small>`;
 
-    // right side: heart button
     let heart = document.createElement("button");
-    heart.innerHTML = data.liked ? "❤️" : "🤍"; 
+    heart.innerHTML = data.liked ? "❤️" : "🤍";
     heart.style.border = "none";
     heart.style.background = "transparent";
     heart.style.cursor = "pointer";
     heart.style.fontSize = "18px";
     heart.style.marginLeft = "10px";
-        // toggle like (one switch only)
     heart.onclick = async () => {
-      await updateDoc(doc(db, "notes", docSnap.id), {
+      await updateDoc(doc(db, "notes", data.id), {
         liked: !data.liked
       });
     };
 
     li.appendChild(left);
     li.appendChild(heart);
-    list.prepend(li);
+    list.appendChild(li); // no need to prepend now, 
     });
   });
+
     // --- Topics ---
   async function addTopic() {
     const val = document.getElementById("topicInput").value;
@@ -379,6 +388,7 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
+
 
 
 
