@@ -123,7 +123,7 @@
 </div>
     <!-- Notes -->
   <div class="section">
-    <h3>Notes 💌</h3>
+    <h3>Notes </h3>
     <input type="text" id="noteInput" placeholder="Write a note...">
     <button onclick="addNote()">Add Note</button>
     <ul id="notesList"></ul>
@@ -131,7 +131,7 @@
 
   <!-- Topics -->
   <div class="section">
-    <h3>Topics to Talk About 💭</h3>
+    <h3>Topics to Talk About </h3>
     <input type="text" id="topicInput" placeholder="Add a topic...">
     <button onclick="addTopic()">Add Topic</button>
     <ul id="topicsList"></ul>
@@ -139,7 +139,7 @@
 
   <!-- To-Do List -->
   <div class="section">
-    <h3>Shared To-Do List 🗒️</h3>
+    <h3>To-Do List </h3>
     <input type="text" id="todoInput" placeholder="Suggest an activity...">
     <button onclick="addTodo()">Add Request</button>
      <h4>Approved Activities</h4>
@@ -209,8 +209,9 @@
     createdAt: new Date()
   });
   document.getElementById("noteInput").value = "";
-  }
-  onSnapshot(collection(db, "notes"), (snapshot) => {
+}
+  
+onSnapshot(collection(db, "notes"), (snapshot) => {
   const list = document.getElementById("notesList");
   list.innerHTML = "";
 
@@ -262,7 +263,6 @@
     list.appendChild(li); // no need to prepend now, 
     });
   });
-
     // --- Topics ---
   async function addTopic() {
     const val = document.getElementById("topicInput").value;
@@ -352,16 +352,37 @@ let declineBtn = document.createElement("button");
     
     else if (data.status === "approved") {
   let li = document.createElement("li");
-  li.style.display = "flex";          // inline layout
-  li.style.alignItems = "center";     // vertical alignment
-  li.style.gap = "3px";               // spacing between checkbox and text
+  let tasks = [];
+  snapshot.forEach((docSnap) => {
+    let data = docSnap.data();
+    if (data.status === "approved") {
+      tasks.push({ id: docSnap.id, ...data });
+    }
+  });
+
+  // ✅ sort: unchecked first, then checked
+  tasks.sort((a, b) => {
+    return (a.done === b.done) ? 0 : a.done ? 1 : -1;
+  });
+  li.style.display = "flex";
+  li.style.alignItems = "center";
+  li.style.gap = "5px";
+  li.style.justifyContent = "flex-start";     // ✅ keep everything left aligned
+  li.style.width = "15%";                    // ✅ force full width for alignment
 
   let checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = data.done === true; // only checked if explicitly true
+checkbox.type = "checkbox";
+checkbox.checked = !!data.done;   // ✅ reflect Firestore state immediately
+checkbox.style.flexShrink = "0";
+checkbox.style.margin = "0";
 
   let span = document.createElement("span");
   span.textContent = data.text;
+  span.style.display = "inline-block";   // ✅ force horizontal flow
+  span.style.flex = "1";                 // ✅ take remaining width
+  span.style.whiteSpace = "nowrap";      // ✅ keep text in a line
+  span.style.textOverflow = "ellipsis";  // optional: add "..."
+
 
   // strike-through when done
   if (data.done) {
@@ -376,6 +397,7 @@ let declineBtn = document.createElement("button");
   li.appendChild(checkbox);
   li.appendChild(span);
   approved.appendChild(li);
+  
       }
     });
   });
@@ -388,10 +410,3 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
