@@ -201,14 +201,14 @@
 
   // --- Notes ---
   async function addNote() {
-    const val = document.getElementById("noteInput").value;
-    if (val.trim() === "") return;
+  const val = document.getElementById("noteInput").value;
+  if (val.trim() === "") return;
 
-    await addDoc(collection(db, "notes"), { 
-      text: val,
-      createdAt: new Date()
-    });
-    document.getElementById("noteInput").value = "";
+  await addDoc(collection(db, "notes"), { 
+    text: val,
+    createdAt: new Date()
+  });
+  document.getElementById("noteInput").value = "";
   }
   onSnapshot(collection(db, "notes"), (snapshot) => {
   const list = document.getElementById("notesList");
@@ -388,6 +388,7 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
+
 
 
 
