@@ -9,39 +9,30 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background: #ffeef5; /* soft powdery pink */ 
+      background: #ffeef5; /* soft powdery pink */
     }
     h1 {
       text-align: center;
       color: #333;
     }
-    .tanks {
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0;
+    h3 {
+      text-align: center;
     }
     .tanks {
       display: flex;
       justify-content: space-between;
+      gap: 20px;
       margin: 20px 0;
     }
     .tank {
-      width: 48%;
+      flex: 1; /* Use flexbox to make tanks equal width */
       text-align: center;
       padding: 10px;
       border-radius: 10px;
-      background: #ebebeb; /* light gray */ 
+      background: #ebebeb; /* light gray */
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .progress {
-      width: 100%;
-      height: 30px;
-      border-radius: 5px;
-      background: #ddd;
-      margin: 10px 0;
-      overflow: hidden;
-    }
-        .progress {
       width: 100%;
       height: 30px;
       border-radius: 5px;
@@ -60,7 +51,7 @@
     .manna .progress-fill {
       background: #b30059; /* deep raspberry pink */
     }
-    button {
+    .tank button {
       margin: 5px;
       padding: 5px 10px;
       border: none;
@@ -88,325 +79,254 @@
       list-style: none;
       padding: 0;
     }
-        li {
+    li {
       padding: 5px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #eee;
     }
+    li:last-child {
+      border-bottom: none;
+    }
     li small {
       color: gray;
       margin-left: 10px;
     }
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
     .actions button {
-      margin-left: 5px;
+      font-size: 1.2em;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .checkbox-item span.done {
+      text-decoration: line-through;
     }
   </style>
 </head>
 <body>
   <h1>Khaled and Manna's Space</h1>
-    <!-- Love Tanks -->
-<div class="tanks">
-  <div class="tank khaled">
-    <h3>Khaled's Tank</h3>
-    <div class="progress"><div class="progress-fill" id="khaled-fill"></div></div>
-    <button onclick="updateTank('khaled', -20)">-</button>
-    <button onclick="updateTank('khaled', 20)">+</button>
+  
+  <div class="tanks">
+    <div class="tank khaled">
+      <h3>Khaled's Tank</h3>
+      <div class="progress"><div class="progress-fill" id="khaled-fill"></div></div>
+      <button onclick="updateTank('khaled', -20)">-</button>
+      <button onclick="updateTank('khaled', 20)">+</button>
+    </div>
+    <div class="tank manna">
+      <h3>Manna's Tank</h3>
+      <div class="progress"><div class="progress-fill" id="manna-fill"></div></div>
+      <button onclick="updateTank('manna', -20)">-</button>
+      <button onclick="updateTank('manna', 20)">+</button>
+    </div>
   </div>
-  <div class="tank manna">
-    <h3>Manna's Tank</h3>
-    <div class="progress"><div class="progress-fill" id="manna-fill"></div></div>
-    <button onclick="updateTank('manna', -20)">-</button>
-    <button onclick="updateTank('manna', 20)">+</button>
-  </div>
-</div>
-    <!-- Notes -->
+  
   <div class="section">
-    <h3>Notes </h3>
+    <h3>Notes 📝</h3>
     <input type="text" id="noteInput" placeholder="Write a note...">
     <button onclick="addNote()">Add Note</button>
     <ul id="notesList"></ul>
   </div>
 
-  <!-- Topics -->
   <div class="section">
-    <h3>Topics to Talk About </h3>
+    <h3>Topics to Talk About 💬</h3>
     <input type="text" id="topicInput" placeholder="Add a topic...">
     <button onclick="addTopic()">Add Topic</button>
     <ul id="topicsList"></ul>
   </div>
 
-  <!-- To-Do List -->
   <div class="section">
-    <h3>To-Do List </h3>
+    <h3>To-Do List ✅📝</h3>
     <input type="text" id="todoInput" placeholder="Suggest an activity...">
     <button onclick="addTodo()">Add Request</button>
-     <h4>Approved Activities</h4>
+    <h4>Approved Activities</h4>
     <ul id="approvedList"></ul>
-   <h4>Pending Requests</h4>
+    <h4>Pending Requests</h4>
     <ul id="pendingList"></ul>
   </div>
-  <!-- Firebase + JS -->
-<script type="module">
-  // --- Firebase imports ---
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { 
-    getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, 
-    collection, addDoc, deleteDoc 
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // --- Config ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_1mznVFDuuC-LV2ALwBMZCD1GshYk8eQ",
-    authDomain: "khaled-manna-space-69ddd.firebaseapp.com",
-    projectId: "khaled-manna-space-69ddd",
-    storageBucket: "khaled-manna-space-69ddd.firebasestorage.app",
-    messagingSenderId: "358770486404",
-    appId: "1:358770486404:web:4773fda8886657e69326d1"
-  };
-    // --- Init ---
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { 
+      getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, 
+      collection, addDoc, deleteDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // --- Tanks ---
-  async function updateTank(person, change) {
-    const ref = doc(db, "tanks", "levels");
-    try {
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        let current = snap.data()[person] || 0;
-        let newVal = Math.max(0, Math.min(100, current + change));
-        console.log("Updating", person, "to", newVal);
-        await updateDoc(ref, { [person]: newVal });
-      } else {
-        console.log("No doc found, creating default");
-        await setDoc(ref, { khaled: 0, manna: 0 });
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_1mznVFDuuC-LV2ALwBMZCD1GshYk8eQ",
+      authDomain: "khaled-manna-space-69ddd.firebaseapp.com",
+      projectId: "khaled-manna-space-69ddd",
+      storageBucket: "khaled-manna-space-69ddd.firebasestorage.app",
+      messagingSenderId: "358770486404",
+      appId: "1:358770486404:web:4773fda8886657e69326d1"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- Utility Functions ---
+    // Creates a list item with a checkbox and text
+    const createCheckboxItem = (id, text, isDone, collectionName) => {
+      const li = document.createElement("li");
+      li.classList.add('checkbox-item');
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = isDone;
+
+      const span = document.createElement("span");
+      span.textContent = text;
+      if (isDone) {
+        span.classList.add('done');
       }
-    } catch (err) {
-      console.error("Error updating tank:", err);
-    }
-  }
-    // Real-time listener
-  onSnapshot(doc(db, "tanks", "levels"), (docSnap) => {
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      console.log("Snapshot update:", data);
-      document.getElementById("khaled-fill").style.width = (data.khaled || 0) + "%";
-      document.getElementById("manna-fill").style.width = (data.manna || 0) + "%";
-    } else {
-      console.log("No snapshot found for tanks/levels");
-    }
-  });
 
-  // --- Notes ---
-  async function addNote() {
-  const val = document.getElementById("noteInput").value;
-  if (val.trim() === "") return;
+      checkbox.onchange = async () => {
+        const docRef = doc(db, collectionName, id);
+        await updateDoc(docRef, { done: checkbox.checked });
+      };
 
-  await addDoc(collection(db, "notes"), { 
-    text: val,
-    createdAt: new Date()
-  });
-  document.getElementById("noteInput").value = "";
-}
-  
-onSnapshot(collection(db, "notes"), (snapshot) => {
-  const list = document.getElementById("notesList");
-  list.innerHTML = "";
-
-  // collect all notes first
-  let notes = [];
-  snapshot.forEach((docSnap) => {
-    notes.push({ id: docSnap.id, ...docSnap.data() });
-  });
-
-  // sort by createdAt (newest first)
-  notes.sort((a, b) => {
-    let da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-    let db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
-    return db - da; // newest first
-  });
-    // now render in sorted order
-  notes.forEach((data) => {
-    let date = data.createdAt?.toDate
-      ? data.createdAt.toDate()
-      : new Date(data.createdAt);
-    let formatted = date.toLocaleString("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short"
-    });
-
-    let li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.justifyContent = "space-between";
-    li.style.alignItems = "center";
-
-    let left = document.createElement("span");
-    left.innerHTML = `${data.text} <small>${formatted}</small>`;
-
-    let heart = document.createElement("button");
-    heart.innerHTML = data.liked ? "❤️" : "🤍";
-    heart.style.border = "none";
-    heart.style.background = "transparent";
-    heart.style.cursor = "pointer";
-    heart.style.fontSize = "18px";
-    heart.style.marginLeft = "10px";
-    heart.onclick = async () => {
-      await updateDoc(doc(db, "notes", data.id), {
-        liked: !data.liked
-      });
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      return li;
     };
 
-    li.appendChild(left);
-    li.appendChild(heart);
-    list.appendChild(li); // no need to prepend now, 
-    });
-  });
-    // --- Topics ---
-  async function addTopic() {
-    const val = document.getElementById("topicInput").value;
-    if (val.trim() === "") return;
-    await addDoc(collection(db, "topics"), { text: val, done: false });
-    document.getElementById("topicInput").value = "";
-  }
-
-  onSnapshot(collection(db, "topics"), (snapshot) => {
-    const list = document.getElementById("topicsList");
-    list.innerHTML = "";
-    snapshot.forEach((docSnap) => {
-      let data = docSnap.data();
-  let li = document.createElement("li");
-li.style.display = "flex";         // makes it inline
-li.style.alignItems = "center";    // centers vertically
-li.style.gap = "3px";              // spacing between checkbox and text
-
-let checkbox = document.createElement("input");
-checkbox.type = "checkbox";
-
-let span = document.createElement("span");
-span.textContent = data.text;
-
-// Apply strikethrough if already approved
-if (checkbox.checked) {
-  span.style.textDecoration = "line-through";
-}
-
-// Add event listener to toggle strikethrough dynamically
-checkbox.addEventListener("change", () => {
-  if (checkbox.checked) {
-    span.style.textDecoration = "line-through";
-  } else {
-    span.style.textDecoration = "none";
-  }
-});
-
-li.appendChild(checkbox);
-li.appendChild(span);
-topicsList.appendChild(li);
-    });
-  });
-    // --- To-do list ---
-  async function addTodo() {
-    const val = document.getElementById("todoInput").value;
-    if (val.trim() === "") return;
-    await addDoc(collection(db, "todos"), { text: val, status: "pending" });
-    document.getElementById("todoInput").value = "";
-  }
-  onSnapshot(collection(db, "todos"), (snapshot) => {
-  const pending = document.getElementById("pendingList");
-  const approved = document.getElementById("approvedList");
-  pending.innerHTML = "";
-  approved.innerHTML = "";
-
-  snapshot.forEach((docSnap) => {
-    let data = docSnap.data();
-    let li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.alignItems = "center";
-
-    if (data.status === "pending") {
-      li.textContent = data.text;
-      let div = document.createElement("div");
-      div.classList.add("actions");
-
-      let approveBtn = document.createElement("button");
-      approveBtn.textContent = "✔";
-      approveBtn.onclick = async () =>
-        approveBtn.onclick = async () => {
-  await updateDoc(doc(db, "todos", docSnap.id), { 
-    status: "approved",
-    done: false   // start unchecked
-  });
-};
-let declineBtn = document.createElement("button");
-      declineBtn.textContent = "✖";
-      declineBtn.onclick = async () =>
-        await deleteDoc(doc(db, "todos", docSnap.id));
-
-      div.appendChild(approveBtn);
-      div.appendChild(declineBtn);
-      li.appendChild(div);
-      pending.appendChild(li);
-    } 
+    // --- Tanks ---
+    window.updateTank = async (person, change) => {
+      const ref = doc(db, "tanks", "levels");
+      try {
+        const snap = await getDoc(ref);
+        let current = snap.exists() ? snap.data()[person] : 0;
+        let newVal = Math.max(0, Math.min(100, current + change));
+        await setDoc(ref, { [person]: newVal }, { merge: true });
+      } catch (err) {
+        console.error("Error updating tank:", err);
+      }
+    };
     
-    else if (data.status === "approved") {
-  let li = document.createElement("li");
-  let tasks = [];
-  snapshot.forEach((docSnap) => {
-    let data = docSnap.data();
-    if (data.status === "approved") {
-      tasks.push({ id: docSnap.id, ...data });
-    }
-  });
-
-  // ✅ sort: unchecked first, then checked
-  tasks.sort((a, b) => {
-    return (a.done === b.done) ? 0 : a.done ? 1 : -1;
-  });
-  li.style.display = "flex";
-  li.style.alignItems = "center";
-  li.style.gap = "5px";
-  li.style.justifyContent = "flex-start";     // ✅ keep everything left aligned
-  li.style.width = "15%";                    // ✅ force full width for alignment
-
-  let checkbox = document.createElement("input");
-checkbox.type = "checkbox";
-checkbox.checked = !!data.done;   // ✅ reflect Firestore state immediately
-checkbox.style.flexShrink = "0";
-checkbox.style.margin = "0";
-
-  let span = document.createElement("span");
-  span.textContent = data.text;
-  span.style.display = "inline-block";   // ✅ force horizontal flow
-  span.style.flex = "1";                 // ✅ take remaining width
-  span.style.whiteSpace = "nowrap";      // ✅ keep text in a line
-  span.style.textOverflow = "ellipsis";  // optional: add "..."
-
-
-  // strike-through when done
-  if (data.done) {
-    span.style.textDecoration = "line-through";
-  }
-
-  // toggle in Firestore when clicked
-  checkbox.onchange = async () => {
-    await updateDoc(doc(db, "todos", docSnap.id), { done: checkbox.checked });
-  };
-
-  li.appendChild(checkbox);
-  li.appendChild(span);
-  approved.appendChild(li);
-  
+    onSnapshot(doc(db, "tanks", "levels"), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("khaled-fill").style.width = (data.khaled || 0) + "%";
+        document.getElementById("manna-fill").style.width = (data.manna || 0) + "%";
       }
     });
-  });
-               
-             // --- Expose globally for buttons ---
-  window.updateTank = updateTank;
-  window.addNote = addNote;
-  window.addTopic = addTopic;
-  window.addTodo = addTodo;
+
+    // --- Notes ---
+    window.addNote = async () => {
+      const input = document.getElementById("noteInput");
+      const text = input.value.trim();
+      if (!text) return;
+      await addDoc(collection(db, "notes"), { text, createdAt: new Date() });
+      input.value = "";
+    };
+
+    onSnapshot(collection(db, "notes"), (snapshot) => {
+      const notes = [];
+      snapshot.forEach(docSnap => notes.push({ id: docSnap.id, ...docSnap.data() }));
+      notes.sort((a, b) => b.createdAt?.toDate() - a.createdAt?.toDate());
+
+      const list = document.getElementById("notesList");
+      list.innerHTML = "";
+      
+      notes.forEach(note => {
+        const date = note.createdAt?.toDate().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+        const li = document.createElement("li");
+        
+        const content = document.createElement("span");
+        content.innerHTML = `${note.text} <small>${date}</small>`;
+        
+        const heartButton = document.createElement("button");
+        heartButton.innerHTML = note.liked ? "❤️" : "🤍";
+        heartButton.style.cssText = "border: none; background: transparent; cursor: pointer; font-size: 1.2em;";
+        heartButton.onclick = async () => {
+          await updateDoc(doc(db, "notes", note.id), { liked: !note.liked });
+        };
+        
+        li.appendChild(content);
+        li.appendChild(heartButton);
+        list.appendChild(li);
+      });
+    });
+
+    // --- Topics ---
+    window.addTopic = async () => {
+      const input = document.getElementById("topicInput");
+      const text = input.value.trim();
+      if (!text) return;
+      await addDoc(collection(db, "topics"), { text, done: false });
+      input.value = "";
+    };
+
+    onSnapshot(collection(db, "topics"), (snapshot) => {
+      const topics = [];
+      snapshot.forEach(docSnap => topics.push({ id: docSnap.id, ...docSnap.data() }));
+      
+      const list = document.getElementById("topicsList");
+      list.innerHTML = "";
+      topics.forEach(topic => {
+        const li = createCheckboxItem(topic.id, topic.text, topic.done, "topics");
+        list.appendChild(li);
+      });
+    });
+
+    // --- To-Do List ---
+    window.addTodo = async () => {
+      const input = document.getElementById("todoInput");
+      const text = input.value.trim();
+      if (!text) return;
+      await addDoc(collection(db, "todos"), { text, status: "pending", done: false });
+      input.value = "";
+    };
+
+    onSnapshot(collection(db, "todos"), (snapshot) => {
+      const pendingList = document.getElementById("pendingList");
+      const approvedList = document.getElementById("approvedList");
+      pendingList.innerHTML = "";
+      approvedList.innerHTML = "";
+      
+      const allTodos = [];
+      snapshot.forEach(docSnap => allTodos.push({ id: docSnap.id, ...docSnap.data() }));
+
+      const pendingItems = allTodos.filter(item => item.status === "pending");
+      const approvedItems = allTodos.filter(item => item.status === "approved");
+
+      // Sort approved items: unchecked first
+      approvedItems.sort((a, b) => (a.done === b.done) ? 0 : a.done ? 1 : -1);
+
+      pendingItems.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.text;
+        
+        const actions = document.createElement("div");
+        actions.classList.add("actions");
+        
+        const approveBtn = document.createElement("button");
+        approveBtn.textContent = "✔";
+        approveBtn.onclick = async () => await updateDoc(doc(db, "todos", item.id), { status: "approved" });
+        
+        const declineBtn = document.createElement("button");
+        declineBtn.textContent = "✖";
+        declineBtn.onclick = async () => await deleteDoc(doc(db, "todos", item.id));
+
+        actions.appendChild(approveBtn);
+        actions.appendChild(declineBtn);
+        li.appendChild(actions);
+        pendingList.appendChild(li);
+      });
+      
+      approvedItems.forEach(item => {
+        const li = createCheckboxItem(item.id, item.text, item.done, "todos");
+        approvedList.appendChild(li);
+      });
+    });
   </script>
 </body>
 </html>
+
