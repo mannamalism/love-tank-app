@@ -251,7 +251,7 @@ onSnapshot(collection(db, "notes"), (snapshot) => {
 
     li.appendChild(left);
     li.appendChild(heart);
-    list.appendChild(li);
+    list.prepend(li);
     });
   });
     // --- Topics ---
@@ -379,6 +379,7 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
+
 
 
 
