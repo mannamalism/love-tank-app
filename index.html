@@ -212,20 +212,46 @@
   }
   
 onSnapshot(collection(db, "notes"), (snapshot) => {
-    const list = document.getElementById("notesList");
-    list.innerHTML = "";
-    snapshot.forEach((doc) => {
-      let data = doc.data();
-      let date = data.createdAt?.toDate 
-        ? data.createdAt.toDate() 
-        : new Date(data.createdAt);
-      let formatted = date.toLocaleString("en-US", {
-        dateStyle: "medium",
-        timeStyle: "short"
+  const list = document.getElementById("notesList");
+  list.innerHTML = "";
+
+  snapshot.forEach((docSnap) => {
+    let data = docSnap.data();
+    let date = data.createdAt?.toDate 
+      ? data.createdAt.toDate() 
+      : new Date(data.createdAt);
+    let formatted = date.toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+        // list item container
+    let li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.alignItems = "center";
+
+    // left side: note + date
+    let left = document.createElement("span");
+    left.innerHTML = `${data.text} <small>${formatted}</small>`;
+
+    // right side: heart button
+    let heart = document.createElement("button");
+    heart.innerHTML = data.liked ? "❤️" : "🤍"; 
+    heart.style.border = "none";
+    heart.style.background = "transparent";
+    heart.style.cursor = "pointer";
+    heart.style.fontSize = "18px";
+    heart.style.marginLeft = "10px";
+        // toggle like (one switch only)
+    heart.onclick = async () => {
+      await updateDoc(doc(db, "notes", docSnap.id), {
+        liked: !data.liked
       });
-      let li = document.createElement("li");
-      li.innerHTML = `<span>${data.text}</span> <small>${formatted}</small>`;
-      list.appendChild(li);
+    };
+
+    li.appendChild(left);
+    li.appendChild(heart);
+    list.appendChild(li);
     });
   });
     // --- Topics ---
@@ -353,5 +379,6 @@ let declineBtn = document.createElement("button");
   </script>
 </body>
 </html>
+
 
 
